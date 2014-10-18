@@ -4,6 +4,8 @@ from Components.ActionMap import ActionMap
 from Components.HelpMenuList import HelpMenuList
 from Components.Sources.StaticText import StaticText
 from Screens.Rc import Rc
+from enigma import eActionMap
+from sys import maxint
 
 class HelpMenu(Screen, Rc):
 	def __init__(self, session, list):
@@ -22,11 +24,30 @@ class HelpMenu(Screen, Rc):
 			"back": self.close,
 		}, -1)
 
+		# Wildcard binding with slightly higher priority than
+		# the wildcard bindings in
+		# InfoBarGenerics.InfoBarUnhandledKey, but with a gap
+		# so that other wildcards can be interposed if needed.
+
+		self.onClose.append(self.doOnClose)
+		eActionMap.getInstance().bindAction('', maxint - 100, self["list"].handleButton)
+
+		# Ignore keypress breaks for the keys in the
+		# ListboxActions context.
+
+		self["listboxFilterActions"] = ActionMap(["ListboxHelpMenuActions"],
+			{
+				"ignore": lambda: 1,
+			}, 1)
+
 		self.onLayoutFinish.append(self.doOnLayoutFinish)
 
 	def doOnLayoutFinish(self):
 		self["list"].onSelChanged.append(self.SelectionChanged)
 		self.SelectionChanged()
+
+	def doOnClose(self):
+		eActionMap.getInstance().unbindAction('', self["list"].handleButton)
 
 	def SelectionChanged(self):
 		self.clearSelectedKeys()
@@ -37,7 +58,6 @@ class HelpMenu(Screen, Rc):
 		shiftButtons=[]
 		if selection:
 			for button in selection[3]:
-				print "button:", button
 				if len(button) > 1:
 					if button[1] == "SHIFT":
 						self.selectKey("SHIFT")
