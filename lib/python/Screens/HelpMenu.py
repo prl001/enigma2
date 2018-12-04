@@ -2,8 +2,8 @@ from Screens.Screen import Screen
 from Screens.MessageBox import MessageBox
 from Components.Label import Label
 from Components.ActionMap import ActionMap
-from Components.HelpMenuList import HelpMenuList
 from Components.Sources.StaticText import StaticText
+from Components.Sources.HelpMenuList import HelpMenuList
 from Screens.Rc import Rc
 from enigma import eActionMap
 from sys import maxint
