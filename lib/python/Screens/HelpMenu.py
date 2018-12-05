@@ -9,19 +9,32 @@ from enigma import eActionMap
 from sys import maxint
 
 class HelpMenu(Screen, Rc):
-	helpText = _("""Help Screen
+	helpText = (
+		_("""Help Screen""") +
+		_("""
 
-Brief help information for buttons in your current context.
+Brief help information for buttons in your current context.""") +
 
-Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help.
+		_("""
 
-Other buttons will jump to the help for that button, if there is help.
+Navigate up/down with UP/DOWN buttons and page up/down with LEFT/RIGHT. EXIT to return to the help screen. OK to perform the action described in the currently highlighted help.""") +
 
-If an action is user-configurable, its help entry will be flagged (C)
+		_("""
 
-A highlight on the remote control image shows which button the help refers to. If more than one button performs the indicated function, more than one highlight will be shown. Text below the list indicates whether the function is for a long press of the button(s).
+Other buttons will jump to the help for that button, if there is help.""") +
+
+		_("""
+
+If an action is user-configurable, its help entry will be flagged (C)""") +
+
+		_("""
+
+A highlight on the remote control image shows which button the help refers to. If more than one button performs the indicated function, more than one highlight will be shown. Text below the list indicates whether the function is for a long press of the button(s).""") +
+
+		_("""
 
 The order and grouping of the help information list can be controlled using MENU>Setup>User Interface>Settings>Sort order for help screen.""")
+	)
 
 	def __init__(self, session, list):
 		Screen.__init__(self, session)
@@ -91,10 +104,10 @@ The order and grouping of the help information list can be controlled using MENU
 			if len(selection[3]) > 1:
 				if longButtons:
 					print "[HelpMenu] SelectionChanged", longButtons
-					longText[textline] = _("Long press: ") + ', '.join(longButtons)
+					longText[textline] = _("Long press: %s") % pgettext("Text list separator", ', ').join(longButtons)
 					textline += 1
 				if shiftButtons:
-					longText[textline] = _("SHIFT: ") + ', '.join(shiftButtons)
+					longText[textline] = _("SHIFT: %s") % pgettext("Text list separator", ', ').join(shiftButtons)
 
 		self["longshift_key0"].setText(longText[0])
 		self["longshift_key1"].setText(longText[1])
