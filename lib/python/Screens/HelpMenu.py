@@ -42,6 +42,7 @@ The order and grouping of the help information list can be controlled using MENU
 		Screen.setTitle(self, self.setup_title)
 		Rc.__init__(self)
 		self["list"] = HelpMenuList(list, self.close, rcPos=self.getRcPositions())
+		self["description"] = Label("")
 		self["longshift_key0"] = Label("")
 		self["longshift_key1"] = Label("")
 
@@ -90,6 +91,8 @@ The order and grouping of the help information list can be controlled using MENU
 		longButtons = []
 		shiftButtons=[]
 		if selection:
+			help = selection[4]
+			self["description"].text = isinstance(help, (list, tuple)) and len(help) > 1 and help[1] or ""
 			for button in selection[3]:
 				if len(button) > 1:
 					if button[1] == "SHIFT":

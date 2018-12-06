@@ -132,7 +132,7 @@ class HelpMenuList(List):
 					helpStr = _("%s (%s)") % (helpStr, tagsStr)
 					help = [helpStr, help[1]] if isExtended else helpStr
 
-				entry = [(actionmap, context, action, buttonNames), help]
+				entry = [(actionmap, context, action, buttonNames, help), help]
 				if self._filterHelpList(entry, helpSeen):
 					actionMapHelp[actMapId()].append(entry)
 
