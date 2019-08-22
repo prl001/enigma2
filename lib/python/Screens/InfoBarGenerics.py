@@ -911,7 +911,8 @@ class NumberZap(Screen):
 			self["servicename"].setText(ServiceReference(self.service).getServiceName())
 
 	def keyNumberGlobal(self, number):
-		self.Timer.start(5000, True)
+		if config.misc.zapkey_delay.value > 0:
+			self.Timer.start(1000*config.misc.zapkey_delay.value, True)
 		self.numberString += str(number)
 		self["number"].setText(self.numberString)
 		self["number_summary"].setText(self.numberString)
@@ -956,7 +957,8 @@ class NumberZap(Screen):
 
 		self.Timer = eTimer()
 		self.Timer.callback.append(self.keyOK)
-		self.Timer.start(5000, True)
+		if config.misc.zapkey_delay.value > 0:
+			self.Timer.start(1000*config.misc.zapkey_delay.value, True)
 
 class InfoBarNumberZap:
 	""" Handles an initial number for NumberZapping """
@@ -1474,6 +1476,7 @@ class SimpleServicelist:
 
 class InfoBarEPG:
 	""" EPG - Opens an EPG list when the showEPGList action fires """
+
 	def __init__(self):
 		self.is_now_next = False
 		self.dlg_stack = []
@@ -1592,9 +1595,7 @@ class InfoBarEPG:
 		self.servicelist.currentServiceRef = self.session.nav.getCurrentlyPlayingServiceOrGroup()
 		if service is not None:
 			if self.servicelist.getRoot() != bouquet: #already in correct bouquet?
-				self.servicelist.clearPath()
-				if self.servicelist.bouquet_root != bouquet:
-					self.servicelist.enterPath(self.servicelist.bouquet_root)
+				self.servicelist.pathUp()
 				self.servicelist.enterPath(bouquet)
 			self.servicelist.setCurrentSelection(service) #select the service in servicelist
 		if not zapback or preview:
@@ -1638,7 +1639,7 @@ class InfoBarEPG:
 		self.reopen(ret)
 
 	def MultiServiceEPG(self):
-		bouquets = self.servicelist.getBouquetList()
+		bouquets = self.servicelist.getEPGBouquetList()
 		if bouquets is None:
 			cnt = 0
 		else:
