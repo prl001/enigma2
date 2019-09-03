@@ -24,7 +24,6 @@ from time import time
 
 
 config.misc.pluginbrowser = ConfigSubsection()
-config.misc.pluginbrowser.bootlogos = ConfigYesNo(default = True)
 config.misc.pluginbrowser.display = ConfigYesNo(default = True)
 config.misc.pluginbrowser.drivers = ConfigYesNo(default = True)
 config.misc.pluginbrowser.extensions = ConfigYesNo(default = True)
@@ -356,11 +355,11 @@ class PluginDownloadBrowser(Screen):
 		})
 		if os.path.isfile('/usr/bin/opkg'):
 			self.ipkg = '/usr/bin/opkg'
-			self.ipkg_install = self.ipkg + ' install'
-			self.ipkg_remove =  self.ipkg + ' remove --autoremove'
+			self.ipkg_install = self.ipkg + ' install --force-overwrite'
+			self.ipkg_remove =  self.ipkg + ' remove --autoremove --force-depends'
 		else:
 			self.ipkg = 'ipkg'
-			self.ipkg_install = 'ipkg install -force-defaults'
+			self.ipkg_install = 'ipkg install --force-overwrite -force-defaults'
 			self.ipkg_remove =  self.ipkg + ' remove'
 
 	def createSummary(self):
@@ -385,8 +384,6 @@ class PluginDownloadBrowser(Screen):
 	def createPluginFilter(self):
 		#Create Plugin Filter
 		self.PLUGIN_PREFIX2 = []
-		if config.misc.pluginbrowser.bootlogos.value:
-			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'bootlogos')
 		if config.misc.pluginbrowser.drivers.value:
 			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'drivers')
 		if config.misc.pluginbrowser.extensions.value:
@@ -411,8 +408,7 @@ class PluginDownloadBrowser(Screen):
 			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'weblinks')
 		if config.misc.pluginbrowser.kernel.value:
 			self.PLUGIN_PREFIX2.append('kernel-module-')
-		if config.misc.pluginbrowser.po.value:
-			self.PLUGIN_PREFIX2.append('enigma2-locale-')
+		self.PLUGIN_PREFIX2.append('enigma2-locale-')
 
 	def go(self):
 		sel = self["list"].l.getCurrentSelection()
@@ -638,26 +634,29 @@ class PluginDownloadBrowser(Screen):
 			plugin = x.split(" - ", 2)
 			# 'opkg list_installed' only returns name + version, no description field
 			if len(plugin) >= 1:
-				if not plugin[0].endswith('-dev') and not plugin[0].endswith('-staticdev') and not plugin[0].endswith('-dbg') and not plugin[0].endswith('-doc') and not plugin[0].endswith('-common') and not plugin[0].endswith('-meta') and plugin[0] not in self.installedplugins and ((not config.pluginbrowser.po.value and not plugin[0].endswith('-po')) or config.pluginbrowser.po.value) and ((not config.pluginbrowser.src.value and not plugin[0].endswith('-src')) or config.pluginbrowser.src.value):
+				if not plugin[0].endswith('-dev') and not plugin[0].endswith('-staticdev') and not plugin[0].endswith('-dbg') and not plugin[0].endswith('-doc') and not plugin[0].endswith('-src') and not plugin[0].endswith('-meta'):
 					# Plugin filter
 					for s in self.PLUGIN_PREFIX2:
 						if plugin[0].startswith(s):
 							if self.run == 1 and self.type == self.DOWNLOAD:
-								self.installedplugins.append(plugin[0])
+								if plugin[0] not in self.installedplugins:
+									self.installedplugins.append(plugin[0])
 							else:
-								if len(plugin) == 2:
-									# 'opkg list_installed' does not return descriptions, append empty description
-									if plugin[0].startswith('enigma2-locale-'):
-										lang = plugin[0].split('-')
-										if len(lang) > 3:
-											plugin.append(lang[2] + '-' + lang[3])
+								if plugin[0] not in self.installedplugins:
+									if len(plugin) == 2:
+										# 'opkg list_installed' does not return descriptions, append empty description
+										if plugin[0].startswith('enigma2-locale-'):
+											lang = plugin[0].split('-')
+											if len(lang) > 3:
+												plugin.append(lang[2] + '-' + lang[3])
+											else:
+												plugin.append(lang[2])
 										else:
-											plugin.append(lang[2])
-									else:
-										plugin.append('')
-								plugin.append(plugin[0][15:])
-								self.pluginlist.append(plugin)
-			self.pluginlist.sort()
+											plugin.append('')
+									plugin.append(plugin[0][15:])
+
+									self.pluginlist.append(plugin)
+#			self.pluginlist.sort()
 
 	def updateList(self):
 		list = []

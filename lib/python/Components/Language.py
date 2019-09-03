@@ -54,7 +54,7 @@ class Language:
 		self.addLanguage("Lietuvių", "lt", "LT", "ISO-8859-15")
 		self.addLanguage("Latviešu", "lv", "LV", "ISO-8859-15")
 		self.addLanguage("Nederlands", "nl", "NL", "ISO-8859-15")
-		self.addLanguage("Norsk Bokmål", "nb", "NO", "ISO-8859-15")
+		self.addLanguage("Norsk Bokmål","nb", "NO", "ISO-8859-15")
 		self.addLanguage("Norsk", "no", "NO", "ISO-8859-15")
 		self.addLanguage("Polski", "pl", "PL", "ISO-8859-15")
 		self.addLanguage("Português", "pt", "PT", "ISO-8859-15")
@@ -80,7 +80,7 @@ class Language:
 			print "[Language] Language " + str(name) + " not found"
 		self.langlistselection.append((str(lang + "_" + country), name))
 
-	def activateLanguage_TRY(self, index):
+	def activateLanguage(self, index):
 		try:
 			if index not in self.lang:
 				print "[Language] Selected language %s is not installed, fallback to en_US!" % index
@@ -96,11 +96,24 @@ class Language:
 					x()
 		except:
 			print "[Language] Selected language does not exist!"
-			return False
+
+		# These should always be C.UTF-8 (or POSIX if C.UTF-8 is unavaible) or program code might behave
+		# differently depending on language setting
+		try:
+			locale.setlocale(locale.LC_CTYPE, ('C', 'UTF-8'))
+		except:
+			pass
+		try:
+			locale.setlocale(locale.LC_COLLATE, ('C', 'UTF-8'))
+		except:
+			try:
+				locale.setlocale(locale.LC_COLLATE, ('POSIX', ''))
+			except:
+				pass
 
 		# NOTE: we do not use LC_ALL, because LC_ALL will not set any of the categories, when one of the categories fails.
 		# We'd rather try to set all available categories, and ignore the others
-		for category in [locale.LC_CTYPE, locale.LC_COLLATE, locale.LC_TIME, locale.LC_MONETARY, locale.LC_MESSAGES, locale.LC_NUMERIC]:
+		for category in [locale.LC_TIME, locale.LC_MONETARY, locale.LC_MESSAGES, locale.LC_NUMERIC ]:
 			try:
 				locale.setlocale(category, (self.getLanguage(), 'UTF-8'))
 			except:
@@ -110,7 +123,7 @@ class Language:
 		try:
 			os.stat('/home/root/.config')
 		except:
-			os.mkdir('/home/root/.config')
+			os.mkdir('/home/root/.config') 
 
 		localeconf = open('/home/root/.config/locale.conf', 'w')
 		for category in ["LC_TIME", "LC_DATE", "LC_MONETARY", "LC_MESSAGES", "LC_NUMERIC", "LC_NAME", "LC_TELEPHONE", "LC_ADDRESS", "LC_PAPER", "LC_IDENTIFICATION", "LC_MEASUREMENT", "LANG" ]:
@@ -126,15 +139,6 @@ class Language:
 		os.environ["LC_TIME"] = self.getLanguage() + '.UTF-8'
 		os.environ["LANGUAGE"] = self.getLanguage() + '.UTF-8'
 		os.environ["GST_SUBTITLE_ENCODING"] = self.getGStreamerSubtitleEncoding()
-		return True
-
-	def activateLanguage(self, index):
-		from Tools import Notifications
-		from Screens.MessageBox import MessageBox
-		if not self.activateLanguage_TRY(index):
-			print "[Language] - retry with ", "en_US"
-			Notifications.AddNotification(MessageBox, _("The selected langugage is unavailable - using en_US"), MessageBox.TYPE_INFO, timeout=3)
-			self.activateLanguage_TRY("en_US")
 
 	def activateLanguageIndex(self, index):
 		if index < len(self.langlist):
@@ -178,11 +182,11 @@ class Language:
 	def delLanguage(self, delLang = None):
 		from Components.config import config, configfile
 		from shutil import rmtree
+		lang = config.osd.language.value
 
 		if delLang:
-			lang = config.osd.language.value
 			print "[Language] DELETE LANG", delLang
-			if delLang[:2] == "en":
+			if delLang == "en_US" or delLang == "en_GB" or delLang == "de_DE" or delLang == "fr_FR":
 				print "[Language] Default Language can not be deleted !!"
 				return
 			elif delLang == "pt_BR":
@@ -192,23 +196,22 @@ class Language:
 			else:
 				os.system("opkg remove --autoremove --force-depends " + Lpackagename + delLang[:2])
 		else:
-			lang = self.activeLanguage
 			print "[Language] Delete all lang except ", lang
 			ll = os.listdir(LPATH)
 			for x in ll:
 				if len(x) > 2:
-					if x != lang and x[:2] != "en":
+					if x != lang and x != "de" and x != "fr":
 						x = x.lower()
 						x = x.replace('_','-')
 						os.system("opkg remove --autoremove --force-depends " + Lpackagename + x)
 				else:
-					if x != lang[:2] and x != "en":
+					if x != lang[:2] and x != "en" and x != "de" and x != "fr":
 						os.system("opkg remove --autoremove --force-depends " + Lpackagename + x)
 					elif x == "pt":
 						if x != lang:
 							os.system("opkg remove --autoremove --force-depends " + Lpackagename + x)
-
-		os.system("touch /etc/enigma2/.removelang")
+			
+			os.system("touch /etc/enigma2/.removelang")
 
 		self.InitLang()
 

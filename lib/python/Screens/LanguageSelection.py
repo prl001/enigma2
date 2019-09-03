@@ -59,11 +59,11 @@ class LanguageSelection(Screen):
 		self.updateList()
 		self.onLayoutFinish.append(self.selectActiveLanguage)
 
-		self["key_red"] = Label("")
-		self["key_green"] = Label("")
-		self["key_yellow"] = Label(_("Add Language"))
-		self["key_blue"] = Label(_("Delete Language(s)"))
-		self["description"] = Label(_("'Save' changes active language.\n'Add Language' or MENU adds additional language(s).\n'Delete Language' allows either deletion of all but English and active language OR selected language"))
+		self["key_red"] = Label(_("Cancel"))
+		self["key_green"] = Label(_("Save"))
+		self["key_yellow"] = Label(_("Update Cache"))
+		self["key_blue"] = Label(_("Delete Language"))
+		self["description"] = Label(_("Press MENU to install additional language(s)."))
 
 		self["actions"] = ActionMap(["SetupActions", "ColorActions"],
 		{
@@ -71,7 +71,7 @@ class LanguageSelection(Screen):
 			"cancel": self.cancel,
 			"red": self.cancel,
 			"green": self.save,
-			"yellow": self.installLanguage,
+			"yellow": self.updateCache,
 			"blue": self.delLang,
 			"menu": self.installLanguage,
 		}, -1)
@@ -136,7 +136,7 @@ class LanguageSelection(Screen):
 			if curlang == t[0]:
 				lang = t[1]
 				break
-		self.session.openWithCallback(self.delLangCB, MessageBox, _("Select 'Yes' to delete all languages except English and current language:\n\nSelect 'No' to delete only the chosen language:\n\n") + _("%s") %(lang), default = True)
+		self.session.openWithCallback(self.delLangCB, MessageBox, _("To delete selected language , answer 'No'\n 'Yes', to delete all other languages,except English, French, German and your selection:\n\n") + _("%s") %(lang), default = False)
 
 	def delLangCB(self, answer):
 		if answer:
@@ -160,10 +160,7 @@ class LanguageSelection(Screen):
 			curlang = config.osd.language.value
 			lang = curlang
 			language.delLanguage(delLang=lang)
-			language.activateLanguage(self.oldActiveLanguage)
-			self.updateList()
-			self.selectActiveLanguage()
-#		self.close()
+		self.close()
 
 	def run(self, justlocal = False):
 #		print "[LanguageSelection] updating language..."
@@ -208,7 +205,7 @@ class LanguageSelection(Screen):
 	def update_after_installLanguage(self):
 		language.InitLang()
 		self.updateList()
-		self.updateCache()
+		self.selectActiveLanguage()
 
 	def changed(self):
 		self.run(justlocal = True)
