@@ -408,7 +408,8 @@ class PluginDownloadBrowser(Screen):
 			self.PLUGIN_PREFIX2.append(self.PLUGIN_PREFIX + 'weblinks')
 		if config.misc.pluginbrowser.kernel.value:
 			self.PLUGIN_PREFIX2.append('kernel-module-')
-		self.PLUGIN_PREFIX2.append('enigma2-locale-')
+		if config.misc.pluginbrowser.po.value:
+			self.PLUGIN_PREFIX2.append('enigma2-locale-')
 
 	def go(self):
 		sel = self["list"].l.getCurrentSelection()
@@ -656,7 +657,7 @@ class PluginDownloadBrowser(Screen):
 									plugin.append(plugin[0][15:])
 
 									self.pluginlist.append(plugin)
-#			self.pluginlist.sort()
+			self.pluginlist.sort()
 
 	def updateList(self):
 		list = []
