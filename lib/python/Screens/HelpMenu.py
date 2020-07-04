@@ -1,5 +1,4 @@
 from Screens.Screen import Screen
-from Screens.MessageBox import MessageBox
 from Components.Label import Label
 from Components.ActionMap import ActionMap
 from Components.Sources.StaticText import StaticText
@@ -118,6 +117,8 @@ The order and grouping of the help information list can be controlled using MENU
 		self["longshift_key1"].setText(longText[1])
 
 	def showHelp(self):
+		# Import deferred so that MessageBox's import of HelpMenu doesn't cause an import loop
+		from Screens.MessageBox import MessageBox
 		self.session.open(MessageBox, _(HelpMenu.helpText), type=MessageBox.TYPE_INFO)
 
 
