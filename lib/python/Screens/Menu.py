@@ -205,7 +205,7 @@ class Menu(Screen, HelpableScreen, ProtectedScreen):
 
 
 	def __init__(self, session, parent):
-		Screen.__init__(self, session)
+		Screen.__init__(self, session, mandatoryWidgets=["menu"])
 		HelpableScreen.__init__(self)
 		list = []
 
