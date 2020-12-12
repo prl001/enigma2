@@ -412,7 +412,7 @@ void eFilePushThreadRecorder::thread()
 				usleep(100000);
 #endif
 				continue; /* this will test m_stop immediately -> while(!m_stop) */
-		}
+			}
 
 			if (errno == EOVERFLOW)
 			{
