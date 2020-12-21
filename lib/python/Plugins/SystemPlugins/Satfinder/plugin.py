@@ -25,8 +25,8 @@ try: # for reading the current transport stream (SatfinderExtra)
 	import datetime
 	import thread
 	dvbreader_available = True
-except ImportError:
-	print "[Satfinder] import dvbreader not available"
+except Exception as err:
+	print("[Satfinder] %s: '%s'" % (type(err).__name__, err))
 	dvbreader_available = False
 
 class Satfinder(ScanSetup, ServiceScan):
