@@ -718,7 +718,7 @@ class Opentv_Zapper():
 
 		# this is here so tuner setup is fresh for every download
 		self.num_tuners = len(getNimListForSat(self.transponder["orbital_position"]))
-		if not (not self.session or self.num_tuners < 1 or self.downloading or self.session.nav.RecordTimer.isRecording()):
+		if self.session and self.num_tuners and not self.downloading and not self.session.nav.RecordTimer.isRecording():
 			self.adapter = None
 			self.downloading = False
 			if not inStandby and self.num_tuners > 1:
@@ -736,7 +736,6 @@ class Opentv_Zapper():
 		else:
 			self.downloadtimer.startLongTimer(wait_time_on_fail) # download not possible at this time. Try again in 10 minutes
 			print("[%s]download not currently possible... Will try again at %s" % (debug_name, strftime("%c", localtime(int(time()) + wait_time_on_fail))))
-		return self.downloading
 
 	def stop_download(self):
 		from Screens.Standby import inStandby
