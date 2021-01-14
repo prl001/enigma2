@@ -12,7 +12,7 @@ from .providers import providers
 config.plugins.opentvzapper = ConfigSubsection()
 config.plugins.opentvzapper.enabled = ConfigYesNo(default = False)
 config.plugins.opentvzapper.providers = ConfigSelection(default="Astra 28.2", choices=list(providers.keys()))
-config.plugins.opentvzapper.extensions = ConfigYesNo(default = False)
+config.plugins.opentvzapper.extensions = ConfigYesNo(default = True)
 config.plugins.opentvzapper.notifications = ConfigYesNo(default = False)
 
 # This import must be after "config" variables are set. 
@@ -27,7 +27,13 @@ class OpentvZapper_Setup(Setup):
 	def keySave(self):
 		if config.plugins.opentvzapper.enabled.value:
 			config.epg.opentv.value = True
+		provider_changed = config.plugins.opentvzapper.providers.isChanged()
+		enabled_changed = config.plugins.opentvzapper.enabled.isChanged()
 		self.saveAll()
+		if provider_changed:
+			opentv_zapper.initialize(config.plugins.opentvzapper.providers.value)
+		if enabled_changed or provider_changed:
+			opentv_zapper.config_changed()
 		self.close()
 		
 

@@ -702,6 +702,7 @@ class Opentv_Zapper():
 			eDVBDB.getInstance().reloadServicelist()
 
 	def config_changed(self, configElement=None):
+		print("[%s] config_changed." % (debug_name))
 		if config.plugins.opentvzapper.enabled.value:
 			self.start_download()
 	
@@ -709,10 +710,12 @@ class Opentv_Zapper():
 		self.session = session
 
 	def force_download(self):
+		print("[%s] forced download." % (debug_name))
 		self.force = True
 		self.start_download()
 
 	def start_download(self):
+		print("[%s] start_download." % (debug_name))
 		self.downloadtimer.stop() # stop any running timer. e.g. we could be coming from "force_download" or "config_changed".
 		from Screens.Standby import inStandby
 
@@ -752,10 +755,6 @@ class Opentv_Zapper():
 		
 		
 opentv_zapper = Opentv_Zapper()
-
-# This is here so Opentv_Zapper() instance is running before the notifier function is added.
-config.plugins.opentvzapper.enabled.addNotifier(opentv_zapper.config_changed, initial_call = False, immediate_feedback=False)
-config.plugins.opentvzapper.enabled.callNotifiersOnSaveAndCancel = True
 
 def startSession(reason, session=None, **kwargs):
 	print("[%s][startSession] reason(%d), session" % (debug_name, reason), session)
