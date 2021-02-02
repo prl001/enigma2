@@ -328,7 +328,10 @@ class SecondInfoBar(Screen, HelpableScreen):
 	REMOVE_TIMER = 1
 
 	def __init__(self, session):
+		print "[SecondInfoBar] __init__()"
 		Screen.__init__(self, session)
+		if config.usage.second_infobar_simple.value:
+			self.skinName = ["SecondInfoBarSimple", "SecondInfoBar"]
 		HelpableScreen.__init__(self)
 		self["epg_description"] = ScrollLabel()
 		self["channel"] = Label()
