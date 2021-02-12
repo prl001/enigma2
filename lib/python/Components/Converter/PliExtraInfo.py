@@ -828,9 +828,6 @@ class PliExtraInfo(Poll, Converter, object):
 
 	@cached
 	def getBool(self):
-		if self.type == "TransponderInfo2line":
-			return bool(self.feraw)
-		
 		service = self.source.service
 		info = service and service.info()
 
