@@ -177,15 +177,16 @@ class MovieList(GUIComponent):
 		self.parentDirectory = 0
 		self.fontName = "Regular"
 		self.fontSize = 20
+		self.itemHeight = 25
 		self.listHeight = None
 		self.listWidth = None
-		self.pbarShift = 5
+		self.pbarShift = None
 		self.pbarHeight = 16
 		self.pbarLargeWidth = 48
 		self.pbarColour = 0x206333
 		self.pbarColourSeen = 0xffc71d
 		self.pbarColourRec = 0xff001d
-		self.partIconeShift = 5
+		self.partIconeShift = None
 		self.spaceRight = 2
 		self.spaceIconeText = 2
 		self.iconsWidth = 22
@@ -290,6 +291,8 @@ class MovieList(GUIComponent):
 			font = parseFont(value, ((1,1),(1,1)))
 			self.fontName = font.family
 			self.fontSize = font.pointSize
+		def itemHeight(value):
+			self.itemHeight = parseScale(value)
 		def pbarShift(value):
 			self.pbarShift = int(value)
 		def pbarHeight(value):
@@ -330,11 +333,8 @@ class MovieList(GUIComponent):
 		return rc
 
 	def setItemsPerPage(self):
-		if self.listHeight > 0:
-			itemHeight = self.listHeight / config.movielist.itemsperpage.value
-		else:
-			itemHeight = 25 # some default (270/5)
-		self.itemHeight = itemHeight
+		numberOfRows = config.movielist.itemsperpage.value
+		itemHeight = self.listHeight // numberOfRows if numberOfRows else self.itemHeight
 		self.l.setItemHeight(itemHeight)
 		self.instance.resize(eSize(self.listWidth, self.listHeight / itemHeight * itemHeight))
 
@@ -454,12 +454,19 @@ class MovieList(GUIComponent):
 			# icon/progress
 			if data:
 				if switch == 'i' and hasattr(data, 'icon') and data.icon is not None:
-					res.append(MultiContentEntryPixmapAlphaBlend(pos=(colX,self.partIconeShift), size=(iconSize,data.icon.size().height()), png=data.icon))
+					if self.partIconeShift is None:
+						res.append(MultiContentEntryPixmapAlphaBlend(pos=(colX,0), size=(iconSize,ih), png=data.icon, flags=BT_ALIGN_CENTER))
+					else:
+						res.append(MultiContentEntryPixmapAlphaBlend(pos=(colX,self.partIconeShift), size=(iconSize,data.icon.size().height()), png=data.icon))
 				elif switch in ('p', 's'):
 					if hasattr(data, 'part') and data.part > 0:
-						res.append(MultiContentEntryProgress(pos=(colX,self.pbarShift), size=(iconSize, self.pbarHeight), percent=data.part, borderWidth=2, foreColor=data.partcol, foreColorSelected=None, backColor=None, backColorSelected=None))
+						pbarY = (self.itemHeight - self.pbarHeight) // 2 if self.pbarShift is None else self.pbarShift
+						res.append(MultiContentEntryProgress(pos=(colX,pbarY), size=(iconSize, self.pbarHeight), percent=data.part, borderWidth=2, foreColor=data.partcol, foreColorSelected=None, backColor=None, backColorSelected=None))
 					elif hasattr(data, 'icon') and data.icon is not None:
-						res.append(MultiContentEntryPixmapAlphaBlend(pos=(colX,self.pbarShift), size=(iconSize, self.pbarHeight), png=data.icon))
+						if self.pbarShift is None:
+							res.append(MultiContentEntryPixmapAlphaBlend(pos=(colX,0), size=(iconSize, ih), png=data.icon, flags=BT_ALIGN_CENTER))
+						else:
+							res.append(MultiContentEntryPixmapAlphaBlend(pos=(colX,self.pbarShift), size=(iconSize, self.pbarHeight), png=data.icon))
 			return iconSize
 
 		if piconWidth > 0:

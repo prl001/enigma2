@@ -40,7 +40,8 @@ config.movielist = ConfigSubsection()
 config.movielist.curentlyplayingservice = ConfigText()
 config.movielist.show_live_tv_in_movielist = ConfigYesNo(default=True)
 config.movielist.fontsize = ConfigSelectionNumber(default = 0, stepwidth = 1, min = -8, max = 10, wraparound = True)
-config.movielist.itemsperpage = ConfigSelectionNumber(default = 20, stepwidth = 1, min = 3, max = 30, wraparound = True)
+choices = [(0, _("Use skin default"))] + [(i, _("%d") % i) for i in range(3, 31)]
+config.movielist.itemsperpage = ConfigSelection(default=0, choices=choices)
 config.movielist.useslim = ConfigYesNo(default=False)
 config.movielist.use_fuzzy_dates = ConfigYesNo(default=True)
 config.movielist.moviesort = ConfigInteger(default=MovieList.SORT_GROUPWISE)
@@ -2097,7 +2098,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		if failedList:
 			failedCount = len(failedList)
 			if failedCount == 1:
-				msg = _("Couldn't move '%s'.\n%s") % (failedList[0], failedList[1])
+				msg = _("Couldn't move '%s'.\n%s") % failedList[0]
 			else:
 				msg = _("Couldn't move %d items.\n%s") % (failedCount, failedList[0][1])
 			mbox = self.session.open(MessageBox, msg, MessageBox.TYPE_ERROR)
@@ -2134,7 +2135,7 @@ class MovieSelection(Screen, HelpableScreen, SelectionEventInfo, InfoBarBase, Pr
 		if failedList:
 			failedCount = len(failedList)
 			if failedCount == 1:
-				msg = _("Couldn't copy '%s'.\n%s") % (failedList[0][0], failedList[0][1])
+				msg = _("Couldn't copy '%s'.\n%s") % failedList[0]
 			else:
 				msg = _("Couldn't copy %d items.\n%s") % (failedCount, failedList[0][1])
 			mbox = self.session.open(MessageBox, msg, MessageBox.TYPE_ERROR)
