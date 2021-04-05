@@ -5,7 +5,7 @@ from Components.Harddisk import harddiskmanager
 from Tools.LoadPixmap import LoadPixmap
 from copy import copy as copy_copy
 from os import path as os_path
-from time import localtime, strftime
+from time import localtime, strftime, mktime
 
 KEYA_LEFT = 0
 KEYA_RIGHT = 1
@@ -1010,8 +1010,15 @@ class ConfigPosition(ConfigSequence):
 clock_limits = [(0, 23), (0, 59)]
 class ConfigClock(ConfigSequence):
 	def __init__(self, default):
-		self.t = localtime(default)
-		ConfigSequence.__init__(self, seperator=":", limits=clock_limits, default=[self.t.tm_hour, self.t.tm_min])
+		# dafault can either be a timestamp
+		# or an (hours, minutes) tuple.
+		if isinstance(default, tuple):
+			l = list(localtime())
+			l[3] = default[0] # hours
+			l[4] = default[1] # minutes
+			default = int(mktime(tuple(l)))
+		t = localtime(default)
+		ConfigSequence.__init__(self, seperator=":", limits=clock_limits, default=[t.tm_hour, t.tm_min])
 
 	def increment(self):
 		# Check if Minutes maxed out
@@ -1110,10 +1117,10 @@ class ConfigClock(ConfigSequence):
 			ConfigSequence.handleKey(self, key)
 
 	def toDisplayString(self, value):
-		newtime = list(self.t)
+		newtime = list(localtime())
 		newtime[3] = value[0]
 		newtime[4] = value[1]
-		retval = strftime(config.usage.time.short.value.replace("%-I", "%_I").replace("%-H", "%_H"), newtime)
+		retval = strftime(config.usage.time.short.value.replace("%-I", "%_I").replace("%-H", "%_H"), tuple(newtime))
 		return retval
 
 	def genText(self):
