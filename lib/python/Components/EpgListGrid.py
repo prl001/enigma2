@@ -466,12 +466,12 @@ class EPGListGrid(EPGListBase):
 						flags=BT_SCALE))
 			if self.borderBottomPix is not None:
 				res.append(MultiContentEntryPixmapAlphaTest(
-						pos=(r1.left(), r1.height()-self.serviceBorderWidth),
+						pos =(r1.left(), r1.height() - self.serviceBorderWidth),
 						size=(r1.width(), self.serviceBorderWidth),
 						png=self.borderBottomPix,
 						flags=BT_SCALE))
 				res.append(MultiContentEntryPixmapAlphaTest(
-						pos=(left, height-self.eventBorderWidth),
+						pos =(left, height - self.eventBorderWidth),
 						size=(width, self.eventBorderWidth),
 						png=self.borderBottomPix,
 						flags=BT_SCALE))
@@ -488,12 +488,12 @@ class EPGListGrid(EPGListBase):
 						flags=BT_SCALE))
 			if self.borderRightPix is not None:
 				res.append(MultiContentEntryPixmapAlphaTest(
-						pos=(r1.width()-self.serviceBorderWidth, r1.left()),
+						pos =(r1.width() - self.serviceBorderWidth, r1.left()),
 						size=(self.serviceBorderWidth, r1.height()),
 						png=self.borderRightPix,
 						flags=BT_SCALE))
 				res.append(MultiContentEntryPixmapAlphaTest(
-						pos=(left + width-self.eventBorderWidth, top),
+						pos =(left + width - self.eventBorderWidth, top),
 						size=(self.eventBorderWidth, height),
 						png=self.borderRightPix,
 						flags=BT_SCALE))
@@ -530,7 +530,7 @@ class EPGListGrid(EPGListBase):
 				if serviceTimers is not None:
 					timer, matchType = RecordTimer.isInTimerOnService(serviceTimers, stime, duration)
 					timerIcon, autoTimerIcon = self.getPixmapsForTimer(timer, matchType, selected)
-					if matchType not in (2,3):
+					if matchType not in (2, 3):
 						timer = None
 				else:
 					timer = matchType = timerIcon = None
@@ -623,7 +623,7 @@ class EPGListGrid(EPGListBase):
 								flags=BT_SCALE))
 					if borderBottomPix is not None:
 						res.append(MultiContentEntryPixmapAlphaTest(
-								pos=(left + xpos, height-self.eventBorderWidth),
+								pos =(left + xpos, height - self.eventBorderWidth),
 								size=(ewidth, self.eventBorderWidth),
 								png=borderBottomPix,
 								flags=BT_SCALE))
@@ -635,7 +635,7 @@ class EPGListGrid(EPGListBase):
 								flags=BT_SCALE))
 					if borderRightPix is not None:
 						res.append(MultiContentEntryPixmapAlphaTest(
-								pos=(left + xpos + ewidth-self.eventBorderWidth, top),
+								pos =(left + xpos + ewidth - self.eventBorderWidth, top),
 								size=(self.eventBorderWidth, height),
 								png=borderRightPix,
 								flags=BT_SCALE))
@@ -659,7 +659,7 @@ class EPGListGrid(EPGListBase):
 							png=timerIcon))
 						if autoTimerIcon:
 							res.append(MultiContentEntryPixmapAlphaBlend(
-								pos=(pos[0]-clockSize,pos[1]), size=(clockSize, clockSize),
+								pos=(pos[0] - clockSize, pos[1]), size=(clockSize, clockSize),
 								png=autoTimerIcon))
 		return res
 
@@ -671,7 +671,7 @@ class EPGListGrid(EPGListBase):
 		events = self.selectedService and self.selectedService[2]  # (service, serviceName, events, picon)
 		if events and self.selectedEventIndex is not None and self.selectedEventIndex < len(events):
 			event = events[self.selectedEventIndex]  # (eventId, eventTitle, beginTime, duration)
-			xpos, width = self.calcEventPosAndWidthHelper(event[2], event[3], 
+			xpos, width = self.calcEventPosAndWidthHelper(event[2], event[3],
 				self.timeBase, self.timeBase + self.timeEpochSecs, self.eventRect.width())
 			self.selectionRect = eRect(xpos + self.eventRect.left(), 0, width, self.eventRect.height())
 		else:
@@ -912,7 +912,7 @@ class TimelineText(GUIComponent):
 		eventLeft = eventRect.left()
 
 		res = [None]
-		
+
 		# Note: eventRect and serviceRect are relative to the timeline text position
 		# while the time lines are relative to the GraphEPG screen position!
 		if self.timeBase != timeBase or self.timeEpoch != timeEpoch or force:
@@ -924,7 +924,7 @@ class TimelineText(GUIComponent):
 # between successive timelines
 # NOTE: that Py3 can/will be different!
 #
-			fnum = float(timeEpoch)/float(timeSteps)
+			fnum = float(timeEpoch) / float(timeSteps)
 			incWidth = int(eventRect.width() / fnum)
 			timeStepsCalc = timeSteps * SECS_IN_MIN
 
@@ -934,11 +934,11 @@ class TimelineText(GUIComponent):
 			if nowTime.tm_year == begTime.tm_year and nowTime.tm_yday == begTime.tm_yday:
 				datestr = _("Today")
 			else:
-				if serviceWidth > (self.timelineFontSize + self.epgConfig.timelinefs.value) * 7.6:
+				if serviceWidth > (self.timelineFontSize + self.epgConfig.timelinefs.value) * 8.1:
 					dateFormat = config.usage.date.daylong.value
-				elif serviceWidth > (self.timelineFontSize + self.epgConfig.timelinefs.value) * 4.5:
+				elif serviceWidth > (self.timelineFontSize + self.epgConfig.timelinefs.value) * 5.8:
 					dateFormat = config.usage.date.dayshort.value
-				elif serviceWidth > (self.timelineFontSize + self.epgConfig.timelinefs.value) * 2.85:
+				elif serviceWidth > (self.timelineFontSize + self.epgConfig.timelinefs.value) * 3.95:
 					dateFormat = config.usage.date.daysmall.value
 				else:
 					dateFormat = "%a"
@@ -965,7 +965,7 @@ class TimelineText(GUIComponent):
 
 			res.append(MultiContentEntryText(
 				pos=(5, 0),
-				size=(serviceRect.width()-15, self.listHeight),
+				size =(serviceRect.width() - 15, self.listHeight),
 				font=0, flags=int(config.epgselection.grid.timelinedate_alignment.value),
 				text=_(datestr),
 				color=foreColor,

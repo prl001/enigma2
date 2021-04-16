@@ -12,11 +12,13 @@ SystemInfo["HasRootSubdir"] = False	# This needs to be here so it can be reset b
 SystemInfo["RecoveryMode"] = False	# This needs to be here so it can be reset by getMultibootslots!
 from Tools.Multiboot import getMBbootdevice, getMultibootslots  # This import needs to be here to avoid a SystemInfo load loop!
 
+
 def getNumVideoDecoders():
 	numVideoDecoders = 0
 	while fileExists("/dev/dvb/adapter0/video%d" % numVideoDecoders, "f"):
 		numVideoDecoders += 1
 	return numVideoDecoders
+
 
 def countFrontpanelLEDs():
 	numLeds = fileExists("/proc/stb/fp/led_set_pattern") and 1 or 0
@@ -144,4 +146,3 @@ SystemInfo["FbcTunerPowerAlwaysOn"] = getBoxType() in ("vusolo4k", "vuduo4k", "v
 SystemInfo["rc_model"] = rc_model.getRcFolder()
 SystemInfo["mapKeyInfoToEpgFunctions"] = SystemInfo["rc_model"] in ("vu", "vu2", "vu3", "vu4") # due to button limitations of the remote control
 SystemInfo["toggleTvRadioButtonEvents"] = SystemInfo["rc_model"] in ("ax4", "beyonwiz1", "beyonwiz2", "gb0", "gb1", "gb2", "gb3", "gb4", "sf8008", "sf8008m", "uniboxhde") # due to button limitations of the remote control
-

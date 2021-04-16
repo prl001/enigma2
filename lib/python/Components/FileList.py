@@ -63,9 +63,10 @@ EXTENSIONS = {
 		"wtv": "movie",
 	}
 
-def FileEntryComponent(name, absolute = None, isDir = False):
-	res = [ (absolute, isDir) ]
-	x, y, w, h = skin.parameters.get("FileListName",(skin.applySkinFactor(35), skin.applySkinFactor(1), skin.applySkinFactor(470), skin.applySkinFactor(20)))
+
+def FileEntryComponent(name, absolute=None, isDir=False):
+	res = [(absolute, isDir)]
+	x, y, w, h = skin.parameters.get("FileListName", (skin.applySkinFactor(35), skin.applySkinFactor(1), skin.applySkinFactor(470), skin.applySkinFactor(20)))
 	res.append((eListboxPythonMultiContent.TYPE_TEXT, x, y, w, h, 0, RT_HALIGN_LEFT, name))
 	if isDir:
 		png = LoadPixmap(cached=True, path=resolveFilename(SCOPE_ACTIVE_SKIN, "extensions/directory.png"))
@@ -77,13 +78,14 @@ def FileEntryComponent(name, absolute = None, isDir = False):
 		else:
 			png = None
 	if png is not None:
-		x, y, w, h = skin.parameters.get("FileListIcon",(skin.applySkinFactor(10), skin.applySkinFactor(2), skin.applySkinFactor(20), skin.applySkinFactor(20)))
+		x, y, w, h = skin.parameters.get("FileListIcon", (skin.applySkinFactor(10), skin.applySkinFactor(2), skin.applySkinFactor(20), skin.applySkinFactor(20)))
 		res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHABLEND, x, y, w, h, png))
 
 	return res
 
+
 class FileList(MenuList):
-	def __init__(self, directory, showDirectories = True, showFiles = True, showMountpoints = True, matchingPattern = None, useServiceRef = False, inhibitDirs = False, inhibitMounts = False, isTop = False, enableWrapAround = False, additionalExtensions = None):
+	def __init__(self, directory, showDirectories=True, showFiles=True, showMountpoints=True, matchingPattern=None, useServiceRef=False, inhibitDirs=False, inhibitMounts=False, isTop=False, enableWrapAround=False, additionalExtensions=None):
 		MenuList.__init__(self, list, enableWrapAround, eListboxPythonMultiContent)
 		self.additional_extensions = additionalExtensions
 		self.mountpoints = []
@@ -111,7 +113,7 @@ class FileList(MenuList):
 
 	def refreshMountpoints(self):
 		self.mountpoints = [os.path.join(p.mountpoint, "") for p in harddiskmanager.getMountedPartitions()]
-		self.mountpoints.sort(reverse = True)
+		self.mountpoints.sort(reverse=True)
 
 	def getMountpoint(self, file):
 		file = os.path.join(os.path.realpath(file), "")
@@ -156,7 +158,7 @@ class FileList(MenuList):
 				return True
 		return False
 
-	def changeDir(self, directory, select = None):
+	def changeDir(self, directory, select=None):
 		self.list = []
 
 		# if we are just entering from the list of mount points:
@@ -173,12 +175,12 @@ class FileList(MenuList):
 			for p in harddiskmanager.getMountedPartitions():
 				path = os.path.join(p.mountpoint, "")
 				if path not in self.inhibitMounts and not self.inParentDirs(path, self.inhibitDirs):
-					self.list.append(FileEntryComponent(name = p.description, absolute = path, isDir = True))
-			files = [ ]
-			directories = [ ]
+					self.list.append(FileEntryComponent(name=p.description, absolute=path, isDir=True))
+			files = []
+			directories = []
 		elif directory is None:
-			files = [ ]
-			directories = [ ]
+			files = []
+			directories = []
 		elif self.useServiceRef:
 			# we should not use the 'eServiceReference(string)' constructor, because it doesn't allow ':' in the directoryname
 			root = eServiceReference.fromDirectory(directory)
@@ -213,15 +215,15 @@ class FileList(MenuList):
 
 		if directory is not None and self.showDirectories and not self.isTop:
 			if directory == self.current_mountpoint and self.showMountpoints:
-				self.list.append(FileEntryComponent(name = "<" +_("List of storage devices") + ">", absolute = None, isDir = True))
+				self.list.append(FileEntryComponent(name="<" + _("List of storage devices") + ">", absolute=None, isDir=True))
 			elif (directory != "/") and not (self.inhibitMounts and self.getMountpoint(directory) in self.inhibitMounts):
-				self.list.append(FileEntryComponent(name = "<" +_("Parent directory") + ">", absolute = '/'.join(directory.split('/')[:-2]) + '/', isDir = True))
+				self.list.append(FileEntryComponent(name="<" + _("Parent directory") + ">", absolute='/'.join(directory.split('/')[:-2]) + '/', isDir=True))
 
 		if self.showDirectories:
 			for x in directories:
 				if not (self.inhibitMounts and self.getMountpoint(x) in self.inhibitMounts) and not self.inParentDirs(x, self.inhibitDirs):
 					name = x.split('/')[-2]
-					self.list.append(FileEntryComponent(name = name, absolute = x, isDir = True))
+					self.list.append(FileEntryComponent(name=name, absolute=x, isDir=True))
 
 		if self.showFiles:
 			for x in files:
@@ -233,10 +235,10 @@ class FileList(MenuList):
 					name = x
 
 				if (self.matchingPattern is None) or self.matchingPattern.search(path):
-					self.list.append(FileEntryComponent(name = name, absolute = x , isDir = False))
+					self.list.append(FileEntryComponent(name=name, absolute=x, isDir=False))
 
 		if self.showMountpoints and len(self.list) == 0:
-			self.list.append(FileEntryComponent(name = _("nothing connected"), absolute = None, isDir = False))
+			self.list.append(FileEntryComponent(name=_("nothing connected"), absolute=None, isDir=False))
 
 		self.l.setList(self.list)
 
@@ -264,7 +266,7 @@ class FileList(MenuList):
 	def descent(self):
 		if self.getSelection() is None:
 			return
-		self.changeDir(self.getSelection()[0], select = self.current_directory)
+		self.changeDir(self.getSelection()[0], select=self.current_directory)
 
 	def getFilename(self):
 		if self.getSelection() is None:
@@ -297,14 +299,14 @@ class FileList(MenuList):
 			self.refresh()
 
 
-def MultiFileSelectEntryComponent(name, absolute = None, isDir = False, selected = False):
-	res = [ (absolute, isDir, selected, name) ]
+def MultiFileSelectEntryComponent(name, absolute=None, isDir=False, selected=False):
+	res = [(absolute, isDir, selected, name)]
 	if not name.startswith('<'):
 		if selected:
 			icon = LoadPixmap(cached=True, path=resolveFilename(SCOPE_ACTIVE_SKIN, "icons/lock_on.png"))
 		else:
 			icon = LoadPixmap(cached=True, path=resolveFilename(SCOPE_ACTIVE_SKIN, "icons/lock_off.png"))
-		x, y, w, h = skin.parameters.get("FileListMultiLock",(skin.applySkinFactor(2), 0, skin.applySkinFactor(25), skin.applySkinFactor(25)))
+		x, y, w, h = skin.parameters.get("FileListMultiLock", (skin.applySkinFactor(2), 0, skin.applySkinFactor(25), skin.applySkinFactor(25)))
 		res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHABLEND, x, y, w, h, icon))
 
 	if isDir:
@@ -318,29 +320,29 @@ def MultiFileSelectEntryComponent(name, absolute = None, isDir = False, selected
 			png = None
 
 	if png is not None:
-		x, y, w, h = skin.parameters.get("FileListMultiIcon",(skin.applySkinFactor(30), skin.applySkinFactor(2), skin.applySkinFactor(20), skin.applySkinFactor(20)))
+		x, y, w, h = skin.parameters.get("FileListMultiIcon", (skin.applySkinFactor(30), skin.applySkinFactor(2), skin.applySkinFactor(20), skin.applySkinFactor(20)))
 		res.append((eListboxPythonMultiContent.TYPE_PIXMAP_ALPHABLEND, x, y, w, h, png))
-		x, y, w, h = skin.parameters.get("FileListMultiName",(skin.applySkinFactor(55), 0, skin.applySkinFactor(470), skin.applySkinFactor(25)))
+		x, y, w, h = skin.parameters.get("FileListMultiName", (skin.applySkinFactor(55), 0, skin.applySkinFactor(470), skin.applySkinFactor(25)))
 		res.append((eListboxPythonMultiContent.TYPE_TEXT, x, y, w, h, 0, RT_HALIGN_LEFT, name))
 	else:
-		x1, y1, w1, h1 = skin.parameters.get("FileListMultiIcon",(skin.applySkinFactor(30), skin.applySkinFactor(2), skin.applySkinFactor(20), skin.applySkinFactor(20)))
-		x, y, w, h = skin.parameters.get("FileListMultiName",(skin.applySkinFactor(55), 0, skin.applySkinFactor(470), skin.applySkinFactor(25)))
+		x1, y1, w1, h1 = skin.parameters.get("FileListMultiIcon", (skin.applySkinFactor(30), skin.applySkinFactor(2), skin.applySkinFactor(20), skin.applySkinFactor(20)))
+		x, y, w, h = skin.parameters.get("FileListMultiName", (skin.applySkinFactor(55), 0, skin.applySkinFactor(470), skin.applySkinFactor(25)))
 		res.append((eListboxPythonMultiContent.TYPE_TEXT, x1, y, w, h, 0, RT_HALIGN_LEFT, name))
 	return res
 
 
 class MultiFileSelectList(FileList):
-	def __init__(self, preselectedFiles, directory, showMountpoints = False, matchingPattern = None, showDirectories = True, showFiles = True,  useServiceRef = False, inhibitDirs = False, inhibitMounts = False, isTop = False, enableWrapAround = False, additionalExtensions = None):
+	def __init__(self, preselectedFiles, directory, showMountpoints=False, matchingPattern=None, showDirectories=True, showFiles=True, useServiceRef=False, inhibitDirs=False, inhibitMounts=False, isTop=False, enableWrapAround=False, additionalExtensions=None):
 		if preselectedFiles is None:
 			self.selectedFiles = []
 		else:
 			self.selectedFiles = preselectedFiles
-		FileList.__init__(self, directory, showMountpoints = showMountpoints, matchingPattern = matchingPattern, showDirectories = showDirectories, showFiles = showFiles,  useServiceRef = useServiceRef, inhibitDirs = inhibitDirs, inhibitMounts = inhibitMounts, isTop = isTop, enableWrapAround = enableWrapAround, additionalExtensions = additionalExtensions)
+		FileList.__init__(self, directory, showMountpoints=showMountpoints, matchingPattern=matchingPattern, showDirectories=showDirectories, showFiles=showFiles, useServiceRef=useServiceRef, inhibitDirs=inhibitDirs, inhibitMounts=inhibitMounts, isTop=isTop, enableWrapAround=enableWrapAround, additionalExtensions=additionalExtensions)
 		self.changeDir(directory)
 		font = skin.fonts.get("FileListMulti", ("Regular", skin.applySkinFactor(20), skin.applySkinFactor(25)))
 		self.l.setFont(0, gFont(font[0], font[1]))
 		self.l.setItemHeight(font[2])
-		self.onSelectionChanged = [ ]
+		self.onSelectionChanged = []
 
 	def selectionChanged(self):
 		for f in self.onSelectionChanged:
@@ -369,7 +371,7 @@ class MultiFileSelectList(FileList):
 					SelectState = True
 					if (realPathname not in self.selectedFiles) and (os.path.normpath(realPathname) not in self.selectedFiles):
 						self.selectedFiles.append(realPathname)
-				newList[idx] = MultiFileSelectEntryComponent(name = x[0][3], absolute = x[0][0], isDir = x[0][1], selected = SelectState)
+				newList[idx] = MultiFileSelectEntryComponent(name=x[0][3], absolute=x[0][0], isDir=x[0][1], selected=SelectState)
 			self.list = newList
 			self.l.setList(self.list)
 
@@ -380,7 +382,7 @@ class MultiFileSelectList(FileList):
 				selectedFilesExist.append(x)
 		return selectedFilesExist
 
-	def changeDir(self, directory, select = None):
+	def changeDir(self, directory, select=None):
 		self.list = []
 
 		# if we are just entering from the list of mount points:
@@ -397,12 +399,12 @@ class MultiFileSelectList(FileList):
 			for p in harddiskmanager.getMountedPartitions():
 				path = os.path.join(p.mountpoint, "")
 				if path not in self.inhibitMounts and not self.inParentDirs(path, self.inhibitDirs):
-					self.list.append(MultiFileSelectEntryComponent(name = p.description, absolute = path, isDir = True))
-			files = [ ]
-			directories = [ ]
+					self.list.append(MultiFileSelectEntryComponent(name=p.description, absolute=path, isDir=True))
+			files = []
+			directories = []
 		elif directory is None:
-			files = [ ]
-			directories = [ ]
+			files = []
+			directories = []
 		elif self.useServiceRef:
 			root = eServiceReference.fromDirectory(directory)
 			if self.additional_extensions:
@@ -436,16 +438,16 @@ class MultiFileSelectList(FileList):
 
 		if directory is not None and self.showDirectories and not self.isTop:
 			if directory == self.current_mountpoint and self.showMountpoints:
-				self.list.append(MultiFileSelectEntryComponent(name = "<" +_("List of storage devices") + ">", absolute = None, isDir = True))
+				self.list.append(MultiFileSelectEntryComponent(name="<" + _("List of storage devices") + ">", absolute=None, isDir=True))
 			elif (directory != "/") and not (self.inhibitMounts and self.getMountpoint(directory) in self.inhibitMounts):
-				self.list.append(MultiFileSelectEntryComponent(name = "<" +_("Parent directory") + ">", absolute = '/'.join(directory.split('/')[:-2]) + '/', isDir = True))
+				self.list.append(MultiFileSelectEntryComponent(name="<" + _("Parent directory") + ">", absolute='/'.join(directory.split('/')[:-2]) + '/', isDir=True))
 
 		if self.showDirectories:
 			for x in directories:
 				if not (self.inhibitMounts and self.getMountpoint(x) in self.inhibitMounts) and not self.inParentDirs(x, self.inhibitDirs):
 					name = x.split('/')[-2]
 					alreadySelected = (x in self.selectedFiles) or (os.path.normpath(x) in self.selectedFiles)
-					self.list.append(MultiFileSelectEntryComponent(name = name, absolute = x, isDir = True, selected = alreadySelected))
+					self.list.append(MultiFileSelectEntryComponent(name=name, absolute=x, isDir=True, selected=alreadySelected))
 
 		if self.showFiles:
 			for x in files:
@@ -460,7 +462,7 @@ class MultiFileSelectList(FileList):
 					for entry in self.selectedFiles:
 						if os.path.basename(entry) == x:
 							alreadySelected = True
-					self.list.append(MultiFileSelectEntryComponent(name = name, absolute = x , isDir = False, selected = alreadySelected))
+					self.list.append(MultiFileSelectEntryComponent(name=name, absolute=x, isDir=False, selected=alreadySelected))
 
 		self.l.setList(self.list)
 
@@ -476,4 +478,3 @@ class MultiFileSelectList(FileList):
 				if p == select:
 					self.moveToIndex(i)
 				i += 1
-
